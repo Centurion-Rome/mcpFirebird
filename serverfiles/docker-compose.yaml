@@ -1,0 +1,24 @@
+name: mcp-firebird
+
+services:
+  mcp-firebird:
+    image: mcp-firebird:latest
+    pull_policy: never
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_HTTP_PORTS: "8080"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  nginx:
+    image: nginx:stable-alpine
+    pull_policy: never
+    depends_on:
+      - mcp-firebird
+    ports:
+      - "${MCP_BIND:-127.0.0.1}:${MCP_PORT:-8182}:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    restart: unless-stopped

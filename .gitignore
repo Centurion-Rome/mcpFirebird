@@ -1,0 +1,4 @@
+.env
+McpFirebird/bin/
+McpFirebird/obj/
+serverfiles/*.tar
