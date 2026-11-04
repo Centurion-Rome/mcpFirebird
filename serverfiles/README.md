@@ -201,3 +201,13 @@ git diff --check
 ```
 
 The dependency-free checks validate SQL generation, rejected inputs, independent gates/configuration and MCP annotations, plus loopback HTTP authentication, discovery and rejected calls using dummy configuration, without connecting to any database. Before production enablement, validate commits, rollback on row-count mismatch/batch failure, cancellation, metadata restrictions and least-privilege grants against a **disposable Firebird 5 database**, never production.
+
+## Where to set `FIREBIRD_API_KEY`
+
+Server side: `.env` (and the deployed `serverfiles/.env`) → `FIREBIRD_API_KEY=<token>`.
+
+Client side (OpenCode): `~/.config/opencode/opencode.json` (or project `opencode.json(c)`) → `mcp.<name>.headers.Authorization = "Bearer <token>"` (or `"Bearer {env:FIREBIRD_API_KEY}"` with the env var set in OpenCode's process). Replace the placeholder `"Bearer <token>"`.
+
+Client side (Claude Code): `.mcp.json` → `headers: { "Authorization": "Bearer ${FIREBIRD_API_KEY}" }`.
+
+Server and all clients must use the **same** token (byte-identical; comparison is against `Bearer <key>`).
