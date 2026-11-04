@@ -2,3 +2,5 @@
 McpFirebird/bin/
 McpFirebird/obj/
 serverfiles/*.tar
+serverfiles/*.zip
+serverfiles/.env

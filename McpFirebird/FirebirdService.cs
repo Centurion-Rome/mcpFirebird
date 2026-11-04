@@ -14,6 +14,13 @@ public sealed class DatabaseOptions
 	public string Password { get; set; } = "";
 	public string Charset { get; set; } = "UTF8";
 	public FbWireCrypt WireCrypt { get; set; } = FbWireCrypt.Enabled;
+	public string WriterUser { get; set; } = "";
+	public string WriterPassword { get; set; } = "";
+	public bool AllowInsertRows { get; set; }
+	public bool AllowUpdateRows { get; set; }
+	public bool AllowDeleteRows { get; set; }
+	public bool AllowCreateTable { get; set; }
+	public bool AllowDropTable { get; set; }
 }
 
 /// <summary>Runs read-only queries against the configured databases.</summary>

@@ -16,16 +16,30 @@ if (!string.IsNullOrWhiteSpace(config["FIREBIRD_DATABASE"]))
 	db.Password = config["FIREBIRD_PASSWORD"] ?? db.Password;
 	db.Charset = config["FIREBIRD_CHARSET"] ?? db.Charset;
 	db.WireCrypt = Enum.TryParse<FirebirdSql.Data.FirebirdClient.FbWireCrypt>(config["FIREBIRD_CONF_WIRECRYPT"], true, out var wireCrypt) ? wireCrypt : db.WireCrypt;
+	db.WriterUser = config["FIREBIRD_WRITER_USER"] ?? "";
+	db.WriterPassword = config["FIREBIRD_WRITER_PASSWORD"] ?? "";
+	db.AllowInsertRows = config.GetValue<bool>("FIREBIRD_ALLOW_INSERT_ROWS");
+	db.AllowUpdateRows = config.GetValue<bool>("FIREBIRD_ALLOW_UPDATE_ROWS");
+	db.AllowDeleteRows = config.GetValue<bool>("FIREBIRD_ALLOW_DELETE_ROWS");
+	db.AllowCreateTable = config.GetValue<bool>("FIREBIRD_ALLOW_CREATE_TABLE");
+	db.AllowDropTable = config.GetValue<bool>("FIREBIRD_ALLOW_DROP_TABLE");
 	databases.TryAdd("default", db);
 }
 if (databases.Count == 0)
 	throw new InvalidOperationException("No Firebird database configured. Set FIREBIRD_DATABASE or Databases__<name>__Database.");
+FirebirdWriteService.ValidateConfiguration(databases, config["FIREBIRD_API_KEY"]);
 
 if (config["MCP_ALLOWED_HOSTS"] is { Length: > 0 } allowedHosts)
 	config["AllowedHosts"] = allowedHosts.Replace(',', ';');
 
 builder.Services.AddSingleton(new FirebirdService(databases));
-builder.Services.AddMcpServer().WithHttpTransport(o => o.Stateless = true).WithTools<FirebirdTools>();
+builder.Services.AddSingleton(new FirebirdWriteService(databases));
+builder.Services.AddMcpServer().WithHttpTransport(o => o.Stateless = true).WithTools<FirebirdTools>().WithTools<FirebirdWriteTools>()
+	.WithRequestFilters(filters => filters.AddCallToolFilter(next => async (context, ct) =>
+	{
+		FirebirdWriteTools.ValidateArguments(context.Params!);
+		return await next(context, ct);
+	}));
 
 var app = builder.Build();
 
