@@ -156,7 +156,7 @@ To forbid an operation, move its exact name to `permissions.deny`; to auto-appro
 
 ## OpenCode V2: connection and permissions
 
-Use project `opencode.json(c)` or global `~/.config/opencode/opencode.json(c)`. V2 uses **`mcp.servers`**, not server names directly under `mcp`; connections are enabled by default (`disabled: true` disables one). This server uses a bearer key, not OAuth. Set the key in the client's environment:
+Use project `opencode.json(c)` or global `~/.config/opencode/opencode.json(c)`. V2 uses **`mcp.servers`**, not server names directly under `mcp`; connections are enabled by default (`disabled: true` disables one). This server uses a bearer key, not OAuth; keep `"oauth": false` in the entry (OpenCode defaults remote servers to OAuth, and without it the connection fails instead of sending the bearer header). Set the key in the client's environment:
 ```json
 {
 	"$schema": "https://opencode.ai/config.json",
@@ -206,7 +206,7 @@ The dependency-free checks validate SQL generation, rejected inputs, independent
 
 Server side: `.env` (and the deployed `serverfiles/.env`) → `FIREBIRD_API_KEY=<token>`.
 
-Client side (OpenCode): `~/.config/opencode/opencode.json` (or project `opencode.json(c)`) → `mcp.<name>.headers.Authorization = "Bearer <token>"` (or `"Bearer {env:FIREBIRD_API_KEY}"` with the env var set in OpenCode's process). Replace the placeholder `"Bearer <token>"`.
+Client side (OpenCode): `~/.config/opencode/opencode.json` (or project `opencode.json(c)`) → `mcp.servers.<name>.headers.Authorization = "Bearer <token>"` (or `"Bearer {env:FIREBIRD_API_KEY}"` with the env var set in OpenCode's process), with `"oauth": false` in the same entry. Replace the placeholder `"Bearer <token>"`.
 
 Client side (Claude Code): `.mcp.json` → `headers: { "Authorization": "Bearer ${FIREBIRD_API_KEY}" }`.
 
