@@ -11,6 +11,8 @@
 * Do not refactor unrelated code or broaden task scope.
 * Match surrounding code style, naming, formatting, brace style, and language.
 * Do not commit or push until explicit asked for
+* no nested classes, each class has own file
+* do not go out of current working directory without permision => always ask user for permission
 
 
 ## 2. Before changing code
