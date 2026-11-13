@@ -7,7 +7,7 @@ using ModelContextProtocol;
 namespace McpFirebird;
 
 /// <summary>Independent, opt-in writer connection; never falls back to the read account.</summary>
-public sealed class FirebirdWriteService(IReadOnlyDictionary<string, DatabaseOptions> databases)
+public sealed class FirebirdWriteService(IReadOnlyDictionary<string, DatabaseOptions> databases, ILogger<FirebirdWriteService>? logger = null)
 {
 	internal static bool IsEnabled(DatabaseOptions db, WriteOperation operation) => operation switch
 	{
@@ -79,6 +79,7 @@ public sealed class FirebirdWriteService(IReadOnlyDictionary<string, DatabaseOpt
 		catch (Exception ex) when (ex is FbException or ArgumentException or FormatException or OverflowException or InvalidCastException)
 		{
 			// Provider/conversion messages can include paths, SQL values, or trigger exception text.
+			logger?.LogError(ex, "Firebird write failed for database {Database}, table {Table}, operation {Operation}", database, plan.Table, operation);
 			throw new McpException("Firebird write failed. Check writer grants, table/column names, value types, constraints and concurrent changes. If the connection failed during commit, verify the outcome before retrying.");
 		}
 	}

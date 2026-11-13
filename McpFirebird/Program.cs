@@ -33,7 +33,7 @@ if (config["MCP_ALLOWED_HOSTS"] is { Length: > 0 } allowedHosts)
 	config["AllowedHosts"] = allowedHosts.Replace(',', ';');
 
 builder.Services.AddSingleton(new FirebirdService(databases));
-builder.Services.AddSingleton(new FirebirdWriteService(databases));
+builder.Services.AddSingleton(sp => new FirebirdWriteService(databases, sp.GetRequiredService<ILogger<FirebirdWriteService>>()));
 builder.Services.AddMcpServer().WithHttpTransport(o => o.Stateless = true).WithTools<FirebirdTools>().WithTools<FirebirdWriteTools>()
 	.WithRequestFilters(filters => filters.AddCallToolFilter(next => async (context, ct) =>
 	{
